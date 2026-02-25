@@ -1,4 +1,5 @@
 import fs from "fs";
+import process from "node:process";
 import "dotenv/config";
 
 const key = process.env.CR_UCF_KEY;
