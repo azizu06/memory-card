@@ -1,4 +1,3 @@
-import menuSfx from "./assets/menu.ogg";
 import { Volume2, VolumeOff } from "lucide-react";
 
 export const Sound = ({ soundOn }) => {
