@@ -3,7 +3,7 @@ import kingSad from "./assets/kingSad.png";
 
 export const Score = ({ cur, best, gameOver }) => {
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 justify-center">
       <div>
         <img
           src={gameOver ? kingSad : kingUp}
