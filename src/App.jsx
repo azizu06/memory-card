@@ -158,7 +158,7 @@ export const App = () => {
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[92rem] flex-col px-3 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-6xl">
           <Score cur={score} best={best} win={win} />
-          <main className="mt-4 rounded-3xl border border-amber-100/25 bg-black/10 p-3 sm:p-4 md:p-6 backdrop-blur-md shadow-[0_24px_40px_rgba(0,0,0,0.35)]">
+          <main className="mt-4 rounded-3xl border border-amber-300/50 bg-gradient-to-b from-amber-200/35 via-amber-100/25 to-amber-200/30 p-3 sm:p-4 md:p-6 backdrop-blur-md shadow-[0_24px_40px_rgba(0,0,0,0.32)]">
             <CardGrid playRound={playRound} flipped={flip} cards={selected} />
           </main>
         </div>
