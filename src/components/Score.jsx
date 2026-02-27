@@ -2,14 +2,12 @@ import sad from "../assets/sad.webp";
 import happy from "../assets/happy.webp";
 import laugh from "../assets/laugh.webp";
 
-export const Score = ({ cur, best, win, setWin }) => {
+export const Score = ({ cur, best, win }) => {
   let pic;
   if (win > 0) {
     pic = laugh;
-    setWin(0);
   } else if (win < 0) {
     pic = sad;
-    setWin(0);
   } else {
     pic = happy;
   }
