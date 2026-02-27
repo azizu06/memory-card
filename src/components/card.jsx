@@ -13,7 +13,7 @@ export const Card = ({ data, flipped, playRound }) => {
           style={{ backgroundImage: `url(${back})`, backgroundSize: "cover" }}
           className="absolute inset-0 rounded-lg grid place-items-center [backface-visibility:hidden] [transform:rotateY(180deg)]"
         ></div>
-        <div className="absolute inset-0 grid place-items-center rounded-lg [backface-visibility:hidden] gap-5 p-2 border">
+        <div className="absolute inset-0 grid place-items-center rounded-lg [backface-visibility:hidden] gap-5 p-2 border bg-slate-400">
           <img
             src={data.img}
             alt="Character"
