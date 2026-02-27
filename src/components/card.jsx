@@ -3,30 +3,26 @@ import back from "../assets/back.png";
 export const Card = ({ data, flipped, playRound }) => {
   return (
     <div
-      className="bg-white rounded-lg min-w-0 p-2"
-      onClick={() => playRound(data.id)}
+      className="bg-white rounded-lg w-48 h-52 p-2 [perspective:1000px]"
+      onClick={() => playRound(data)}
     >
       <div
-        style={
-          flipped
-            ? {
-                backgroundImage: `url(${back})`,
-                backgroundSize: "cover",
-              }
-            : null
-        }
-        className={!flipped ? "p-2 bg-slate-400" : "p-8"}
+        className={`p-3 relative w-full h-full duration-500 [transform-style:preserve-3d] ${flipped ? "[transform:rotateY(180deg)]" : ""}`}
       >
-        {!flipped && (
-          <div className="flex flex-col gap-4 p-2 items-center border">
-            <img
-              src={data.img}
-              alt="Character"
-              className="w-28 h-28 object-cover"
-            />
-            <p>{data.name}</p>
-          </div>
-        )}
+        <div
+          style={{ backgroundImage: `url(${back})`, backgroundSize: "cover" }}
+          className="absolute inset-0 rounded-lg grid place-items-center [backface-visibility:hidden] [transform:rotateY(180deg)]"
+        ></div>
+        <div className="absolute inset-0 grid place-items-center rounded-lg [backface-visibility:hidden] gap-5 p-2 border">
+          <img
+            src={data.img}
+            alt="Character"
+            className="w-32 h-32 object-cover"
+          />
+          <p className="text-center leading-tight min-h-[1rem] flex items-center justify-center">
+            {data.name}
+          </p>
+        </div>
       </div>
     </div>
   );
