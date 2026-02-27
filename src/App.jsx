@@ -30,12 +30,18 @@ export const App = () => {
   const picked = useRef(new Set());
   const gameRunning = useRef(false);
   const sounds = useRef({});
-  const timers = useRef([]);
-  const curScore = useRef(0);
+  const shuffleTimer = useRef(null);
+  const resetTimer = useRef(null);
 
   const clearTimers = () => {
-    timers.current.forEach(clearTimeout);
-    timers.current = [];
+    if (shuffleTimer.current) {
+      clearTimeout(shuffleTimer.current);
+      shuffleTimer.current = null;
+    }
+    if (resetTimer.current) {
+      clearTimeout(resetTimer.current);
+      resetTimer.current = null;
+    }
   };
 
   useEffect(() => {
@@ -86,38 +92,34 @@ export const App = () => {
   const handleFlip = (type) => {
     clearTimers();
     if (type === "newGame") {
-      timers.current.push(
-        setTimeout(() => {
-          setSelected(shuffle(cards).slice(0, 12));
-        }, 500),
-      );
-      timers.current.push(
-        setTimeout(() => {
-          setWin(0);
-          setFlip(false);
-          gameRunning.current = false;
-        }, 1500),
-      );
-    } else {
-      timers.current.push(
-        setTimeout(() => {
-          setSelected((prev) => shuffle(prev));
-        }, 500),
-      );
-      timers.current.push(
-        setTimeout(() => {
-          setFlip(false);
-          gameRunning.current = false;
-        }, 750),
-      );
+      shuffleTimer.current = setTimeout(() => {
+        setSelected(shuffle(cards).slice(0, 12));
+        shuffleTimer.current = null;
+      }, 500);
+      resetTimer.current = setTimeout(() => {
+        setWin(0);
+        setFlip(false);
+        gameRunning.current = false;
+        resetTimer.current = null;
+      }, 1500);
+      return;
     }
+    shuffleTimer.current = setTimeout(() => {
+      setSelected((prev) => shuffle(prev));
+      shuffleTimer.current = null;
+    }, 500);
+    resetTimer.current = setTimeout(() => {
+      setFlip(false);
+      gameRunning.current = false;
+      resetTimer.current = null;
+    }, 750);
   };
 
   const playRound = (card) => {
     if (gameRunning.current) return;
     gameRunning.current = true;
     if (picked.current.has(card.id)) {
-      setBest((prev) => Math.max(prev, curScore.current));
+      setBest((prev) => Math.max(prev, score));
       setScore(0);
       setWin(-1);
       setFlip(true);
@@ -125,38 +127,41 @@ export const App = () => {
       playSfx("shuffle");
       picked.current.clear();
       handleFlip("newGame");
-    } else {
-      setScore((prev) => {
-        const newScore = prev + 1;
-        curScore.current = newScore;
-        return newScore;
-      });
-      if (curScore.current === 12) {
-        setWin(1);
-        setFlip(true);
-        playSfx("laugh");
-        playSfx("shuffle");
-        picked.current.clear();
-        handleFlip("newGame");
-      } else {
-        picked.current.add(card.id);
-        setFlip(true);
-        playSfx("happy");
-        playSfx("flip");
-        handleFlip("flip");
-      }
+      return;
     }
+    const nextScore = score + 1;
+    setScore(nextScore);
+    if (nextScore === 12) {
+      setWin(1);
+      setFlip(true);
+      playSfx("laugh");
+      playSfx("shuffle");
+      picked.current.clear();
+      handleFlip("newGame");
+      return;
+    }
+    picked.current.add(card.id);
+    setFlip(true);
+    playSfx("happy");
+    playSfx("flip");
+    handleFlip("flip");
   };
 
   return (
     <div
-      className="min-h-screen bg-cover bg-no-repeat bg-center w-full flex flex-col"
+      className="relative min-h-screen w-full overflow-hidden bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${arena})` }}
     >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,0,0,0.15),rgba(0,0,0,0.08)_45%,rgba(0,0,0,0.17))]" />
       <Sound sound={sound} setSound={setSound} />
-      <div className=" min-h-screen flex flex-1 flex-col border-red-700 border-[6px] gap-12 w-full items-center">
-        <Score cur={score} best={best} win={win} />
-        <CardGrid playRound={playRound} flipped={flip} cards={selected} />
+
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[92rem] flex-col px-3 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-6xl">
+          <Score cur={score} best={best} win={win} />
+          <main className="mt-4 rounded-3xl border border-amber-100/25 bg-black/10 p-3 sm:p-4 md:p-6 backdrop-blur-md shadow-[0_24px_40px_rgba(0,0,0,0.35)]">
+            <CardGrid playRound={playRound} flipped={flip} cards={selected} />
+          </main>
+        </div>
       </div>
     </div>
   );
