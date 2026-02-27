@@ -1,17 +1,25 @@
-import kingUp from "./assets/kingUp.png";
-import kingSad from "./assets/kingSad.png";
+import sad from "../assets/sad.webp";
+import happy from "../assets/happy.webp";
+import laugh from "../assets/laugh.webp";
 
-export const Score = ({ cur, best, gameOver }) => {
+export const Score = ({ cur, best, win, setWin }) => {
+  let pic;
+  if (win > 0) {
+    pic = laugh;
+    setWin(0);
+  } else if (win < 0) {
+    pic = sad;
+    setWin(0);
+  } else {
+    pic = happy;
+  }
+
   return (
-    <div className="flex gap-4 justify-center">
-      <div>
-        <img
-          src={gameOver ? kingSad : kingUp}
-          alt="Happy King"
-          className="w-7 h-7"
-        />
+    <div className="flex gap-4 w-full border justify-center h-fit pt-10">
+      <div className="flex border items-center">
+        <img src={pic} alt="Happy King" className="w-25 h-20 border items" />
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1 border justify-center bg-red-500 p-4">
         <h1>Score: {cur}</h1>
         <h1>High Score: {best}</h1>
       </div>
