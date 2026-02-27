@@ -131,7 +131,7 @@ export const App = () => {
     }
     const nextScore = score + 1;
     setScore(nextScore);
-    if (nextScore === 12) {
+    if (nextScore % 12 === 0) {
       setWin(1);
       setFlip(true);
       playSfx("laugh");
