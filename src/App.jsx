@@ -30,7 +30,7 @@ export const App = () => {
   const picked = useRef(new Set());
   const gameRunning = useRef(false);
   const sounds = useRef({});
-  const emoteTimer = useRef(null);
+  const resetTimer = useRef(null);
 
   useEffect(() => {
     fetch("/cards.json")
@@ -49,7 +49,7 @@ export const App = () => {
       sounds.current[s].volume = 0.5;
     }
     return () => {
-      if (emoteTimer.current) clearTimeout(emoteTimer.current);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
     };
   }, []);
 
@@ -76,13 +76,23 @@ export const App = () => {
     sfx.play().catch(() => {});
   };
 
-  const resetEmote = () => {
-    if (emoteTimer.current) clearTimeout(emoteTimer.current);
-    emoteTimer.current = setTimeout(() => {
-      setWin(0);
-      gameRunning.current = false;
-      emoteTimer.current = null;
-    }, 1500);
+  const handleFlip = (type) => {
+    if (type === "newGame") {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => {
+        setWin(0);
+        setFlip(false);
+        gameRunning.current = false;
+        resetTimer.current = null;
+      }, 1500);
+    } else {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => {
+        setFlip(false);
+        gameRunning.current = false;
+        resetTimer.current = null;
+      }, 500);
+    }
   };
 
   const playRound = (card) => {
@@ -92,24 +102,30 @@ export const App = () => {
       setBest(Math.max(best, score));
       setScore(0);
       setWin(-1);
+      setFlip(true);
       playSfx("sad");
+      playSfx("shuffle");
       picked.current.clear();
       setSelected(shuffle(cards).slice(0, 12));
-      resetEmote();
+      handleFlip("newGame");
     } else {
       const newScore = score + 1;
       setScore(newScore);
       if (newScore === 12) {
         setWin(1);
+        setFlip(true);
         playSfx("laugh");
+        playSfx("shuffle");
         picked.current.clear();
         setSelected(shuffle(cards).slice(0, 12));
-        resetEmote();
+        handleFlip("newGame");
       } else {
         picked.current.add(card.id);
+        setFlip(true);
         playSfx("happy");
+        playSfx("flip");
         setSelected((prev) => shuffle(prev));
-        gameRunning.current = false;
+        handleFlip("flip");
       }
     }
   };
