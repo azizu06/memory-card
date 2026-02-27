@@ -1,4 +1,4 @@
-import { Card } from "./card";
+import { Card } from "./Card";
 export const CardGrid = ({ cards, flipped, playRound }) => {
   return (
     <div className="grid gap-6 border-orange-500 border-[6px] grid-cols-4 grid-rows-3 justify-items-center justify-center ">

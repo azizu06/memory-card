@@ -11,7 +11,6 @@ export const Score = ({ cur, best, win }) => {
   } else {
     pic = happy;
   }
-
   return (
     <div className="flex gap-4 w-full border justify-center h-fit pt-10">
       <div className="flex border items-center">
