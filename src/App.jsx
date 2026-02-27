@@ -30,6 +30,7 @@ export const App = () => {
   const picked = useRef(new Set());
   const gameRunning = useRef(false);
   const sounds = useRef({});
+  const emoteTimer = useRef(null);
 
   useEffect(() => {
     fetch("/cards.json")
@@ -47,6 +48,9 @@ export const App = () => {
       sounds.current[s] = new Audio(sfxFiles[s]);
       sounds.current[s].volume = 0.5;
     }
+    return () => {
+      if (emoteTimer.current) clearTimeout(emoteTimer.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -72,8 +76,18 @@ export const App = () => {
     sfx.play().catch(() => {});
   };
 
+  const resetEmote = () => {
+    if (emoteTimer.current) clearTimeout(emoteTimer.current);
+    emoteTimer.current = setTimeout(() => {
+      setWin(0);
+      gameRunning.current = false;
+      emoteTimer.current = null;
+    }, 1500);
+  };
+
   const playRound = (card) => {
     if (gameRunning.current) return;
+    gameRunning.current = true;
     if (picked.current.has(card.id)) {
       setBest(Math.max(best, score));
       setScore(0);
@@ -81,20 +95,22 @@ export const App = () => {
       playSfx("sad");
       picked.current.clear();
       setSelected(shuffle(cards).slice(0, 12));
+      resetEmote();
     } else {
-      gameRunning.current = true;
-      setScore((s) => s + 1);
-      if (score === 12) {
+      const newScore = score + 1;
+      setScore(newScore);
+      if (newScore === 12) {
         setWin(1);
         playSfx("laugh");
         picked.current.clear();
         setSelected(shuffle(cards).slice(0, 12));
+        resetEmote();
       } else {
         picked.current.add(card.id);
         playSfx("happy");
-        shuffle(selected);
+        setSelected((prev) => shuffle(prev));
+        gameRunning.current = false;
       }
-      gameRunning.current = false;
     }
   };
 
@@ -105,7 +121,7 @@ export const App = () => {
     >
       <Sound sound={sound} setSound={setSound} />
       <div className=" min-h-screen flex flex-1 flex-col border-red-700 border-[6px] gap-12 w-full items-center">
-        <Score cur={score} best={best} win={win} setWin={setWin} />
+        <Score cur={score} best={best} win={win} />
         <CardGrid playRound={playRound} flipped={flip} cards={selected} />
       </div>
     </div>
