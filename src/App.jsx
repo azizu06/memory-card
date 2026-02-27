@@ -20,7 +20,7 @@ const shuffle = (cards) => {
 };
 
 export const App = () => {
-  const [sound, setSound] = useState(false);
+  const [sound, setSound] = useState(true);
   const [win, setWin] = useState(0);
   const [flip, setFlip] = useState(false);
   const [score, setScore] = useState(0);
