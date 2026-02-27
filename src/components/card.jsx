@@ -7,11 +7,11 @@ export const Card = ({ data, flipped, playRound }) => {
       onClick={() => playRound(data)}
     >
       <div
-        className={`p-3 relative w-full h-full duration-500 [transform-style:preserve-3d] ${flipped ? "[transform:rotateY(180deg)]" : ""}`}
+        className={`p-3 relative w-full h-full duration-500 [transform-style:preserve-3d] transition-transform ease-in-out ${flipped ? "[transform:rotateY(180deg)]" : ""}`}
       >
         <div
           style={{ backgroundImage: `url(${back})`, backgroundSize: "cover" }}
-          className="absolute inset-0 rounded-lg grid place-items-center [backface-visibility:hidden] [transform:rotateY(180deg)]"
+          className="absolute inset-0 rounded-lg grid place-items-center [backface-visibility:hidden] [transform:rotateY(180deg)] transition-transform ease-in-out"
         ></div>
         <div className="absolute inset-0 grid place-items-center rounded-lg [backface-visibility:hidden] gap-5 p-2 border bg-slate-400">
           <img
