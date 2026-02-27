@@ -12,7 +12,7 @@ import { Sound } from "./components/Sound";
 
 const shuffle = (cards) => {
   const copy = [...cards];
-  for (let i = copy.length - 1; i >= 0; i--) {
+  for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
@@ -30,7 +30,13 @@ export const App = () => {
   const picked = useRef(new Set());
   const gameRunning = useRef(false);
   const sounds = useRef({});
-  const resetTimer = useRef(null);
+  const timers = useRef([]);
+  const curScore = useRef(0);
+
+  const clearTimers = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
 
   useEffect(() => {
     fetch("/cards.json")
@@ -46,10 +52,11 @@ export const App = () => {
     };
     for (const s in sfxFiles) {
       sounds.current[s] = new Audio(sfxFiles[s]);
-      sounds.current[s].volume = 0.5;
+      const vol = s === "flip" || s === "shuffle" ? 1 : 0.25;
+      sounds.current[s].volume = vol;
     }
     return () => {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
+      clearTimers();
     };
   }, []);
 
@@ -77,21 +84,32 @@ export const App = () => {
   };
 
   const handleFlip = (type) => {
+    clearTimers();
     if (type === "newGame") {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-      resetTimer.current = setTimeout(() => {
-        setWin(0);
-        setFlip(false);
-        gameRunning.current = false;
-        resetTimer.current = null;
-      }, 1500);
+      timers.current.push(
+        setTimeout(() => {
+          setSelected(shuffle(cards).slice(0, 12));
+        }, 500),
+      );
+      timers.current.push(
+        setTimeout(() => {
+          setWin(0);
+          setFlip(false);
+          gameRunning.current = false;
+        }, 1500),
+      );
     } else {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-      resetTimer.current = setTimeout(() => {
-        setFlip(false);
-        gameRunning.current = false;
-        resetTimer.current = null;
-      }, 500);
+      timers.current.push(
+        setTimeout(() => {
+          setSelected((prev) => shuffle(prev));
+        }, 500),
+      );
+      timers.current.push(
+        setTimeout(() => {
+          setFlip(false);
+          gameRunning.current = false;
+        }, 750),
+      );
     }
   };
 
@@ -99,32 +117,32 @@ export const App = () => {
     if (gameRunning.current) return;
     gameRunning.current = true;
     if (picked.current.has(card.id)) {
-      setBest(Math.max(best, score));
+      setBest((prev) => Math.max(prev, curScore.current));
       setScore(0);
       setWin(-1);
       setFlip(true);
       playSfx("sad");
       playSfx("shuffle");
       picked.current.clear();
-      setSelected(shuffle(cards).slice(0, 12));
       handleFlip("newGame");
     } else {
-      const newScore = score + 1;
-      setScore(newScore);
-      if (newScore === 12) {
+      setScore((prev) => {
+        const newScore = prev + 1;
+        curScore.current = newScore;
+        return newScore;
+      });
+      if (curScore.current === 12) {
         setWin(1);
         setFlip(true);
         playSfx("laugh");
         playSfx("shuffle");
         picked.current.clear();
-        setSelected(shuffle(cards).slice(0, 12));
         handleFlip("newGame");
       } else {
         picked.current.add(card.id);
         setFlip(true);
         playSfx("happy");
         playSfx("flip");
-        setSelected((prev) => shuffle(prev));
         handleFlip("flip");
       }
     }
