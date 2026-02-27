@@ -73,7 +73,7 @@ export const App = () => {
   };
 
   const playRound = (card) => {
-    if (gameRunning) return;
+    if (gameRunning.current) return;
     if (picked.current.has(card.id)) {
       setBest(Math.max(best, score));
       setScore(0);
@@ -100,13 +100,13 @@ export const App = () => {
 
   return (
     <div
-      className="min-h-screen bg-cover bg-no-repeat bg-center"
+      className="min-h-screen bg-cover bg-no-repeat bg-center w-full flex flex-col"
       style={{ backgroundImage: `url(${arena})` }}
     >
       <Sound sound={sound} setSound={setSound} />
-      <div className="grid grid-rows-2 border min-h-screen gap-8">
+      <div className=" min-h-screen flex flex-1 flex-col border-red-700 border-[6px] gap-12 w-full items-center">
         <Score cur={score} best={best} win={win} setWin={setWin} />
-        <CardGrid playRound={playRound} />
+        <CardGrid playRound={playRound} flipped={flip} cards={selected} />
       </div>
     </div>
   );
